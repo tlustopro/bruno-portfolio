@@ -1,0 +1,11 @@
+# Bruno environments s citlivými daty
+collections/environments/*.bru
+!collections/environments/prod.bru
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
