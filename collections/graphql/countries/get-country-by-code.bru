@@ -1,0 +1,61 @@
+meta {
+  name: Get Country By Code
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  query GetCountry($code: ID!) {
+    country(code: $code) {
+      name
+      native
+      capital
+      currency
+      languages {
+        name
+      }
+      continent {
+        name
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "code": "CZ"
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("no GraphQL errors", function() {
+    expect(res.body).to.not.have.property('errors');
+  });
+
+  test("country is Czech Republic", function() {
+    expect(res.body.data.country.name).to.equal("Czechia");
+  });
+
+  test("capital is Prague", function() {
+    expect(res.body.data.country.capital).to.equal("Prague");
+  });
+
+  test("has at least one language", function() {
+    expect(res.body.data.country.languages).to.be.an('array');
+    expect(res.body.data.country.languages.length).to.be.greaterThan(0);
+  });
+
+  test("is in Europe", function() {
+    expect(res.body.data.country.continent.name).to.equal("Europe");
+  });
+}

@@ -1,0 +1,59 @@
+meta {
+  name: Get All Countries
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  query {
+    countries {
+      code
+      name
+      emoji
+      continent {
+        name
+      }
+    }
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("no GraphQL errors", function() {
+    expect(res.body).to.not.have.property('errors');
+  });
+
+  test("data.countries is an array", function() {
+    expect(res.body.data.countries).to.be.an('array');
+  });
+
+  test("returns more than 100 countries", function() {
+    expect(res.body.data.countries.length).to.be.greaterThan(100);
+  });
+
+  test("each country has code, name, emoji and continent", function() {
+    res.body.data.countries.forEach(function(country) {
+      expect(country).to.have.property('code');
+      expect(country).to.have.property('name');
+      expect(country).to.have.property('emoji');
+      expect(country).to.have.property('continent');
+      expect(country.continent).to.have.property('name');
+    });
+  });
+
+  test("country code is 2-letter string", function() {
+    res.body.data.countries.forEach(function(country) {
+      expect(country.code).to.be.a('string');
+      expect(country.code.length).to.equal(2);
+    });
+  });
+}
