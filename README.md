@@ -1,36 +1,36 @@
 # Bruno API Testing Portfolio
 
-Ukázková kolekce API testů napsaných v nástroji [Bruno](https://www.usebruno.com/) — open-source alternativa k Postman/Insomnia.
+A sample collection of API tests written in [Bruno](https://www.usebruno.com/) — an open-source alternative to Postman/Insomnia.
 
-## Co je Bruno?
+## What is Bruno?
 
-Bruno je offline-first API klient s vlastním DSL pro definici requestů a testů. Kolekce jsou plain-text soubory verzovatelné v gitu.
+Bruno is an offline-first API client with its own DSL for defining requests and tests. Collections are plain-text files that can be version-controlled in git.
 
-## Struktura projektu
+## Project Structure
 
 ```
 collections/
-├── environments/       # Environment proměnné
+├── environments/       # Environment variables
 ├── rest/
-│   ├── users/          # CRUD operace nad users endpointem
-│   └── posts/          # Posts + comments s pre/post skripty
+│   ├── users/          # CRUD operations on the users endpoint
+│   └── posts/          # Posts + comments with pre/post scripts
 └── graphql/
-    └── countries/      # GraphQL dotazy s proměnnými
+    └── countries/      # GraphQL queries with variables
 ```
 
-## Použitá veřejná API
+## Public APIs Used
 
-| Kolekce | API | Dokumentace |
-|---------|-----|-------------|
+| Collection | API | Documentation |
+|------------|-----|---------------|
 | REST | JSONPlaceholder | https://jsonplaceholder.typicode.com |
 | GraphQL | Countries API | https://countries.trevorblades.com |
 
-## Jak spustit testy
+## How to Run Tests
 
-1. Nainstaluj Bruno: https://www.usebruno.com/downloads
-2. Otevři složku `collections/` jako kolekci
-3. Vyber environment `prod`
-4. Spusť libovolný request nebo celou kolekci
+1. Install Bruno: https://www.usebruno.com/downloads
+2. Open the `collections/` folder as a collection
+3. Select the `prod` environment
+4. Run any request or the entire collection
 
 ### CLI (headless)
 
@@ -40,10 +40,10 @@ bru run --env prod collections/rest/users/
 bru run --env prod collections/graphql/
 ```
 
-## Ukázky testovací logiky
+## Testing Logic Examples
 
-- **Stavové kódy** — 200 OK, 201 Created
-- **Struktura odpovědi** — povinná pole, datové typy
-- **Obchodní pravidla** — email validace regexem, pole nejsou prázdná
-- **GraphQL specifika** — absence `errors`, navigace přes `data.*`
-- **Pre/post-request skripty** — sdílení dat mezi requesty přes `bru.setVar()`
+- **Status codes** — 200 OK, 201 Created
+- **Response structure** — required fields, data types
+- **Business rules** — email validation with regex, arrays are not empty
+- **GraphQL specifics** — absence of `errors`, navigation via `data.*`
+- **Pre/post-request scripts** — sharing data between requests via `bru.setVar()`
