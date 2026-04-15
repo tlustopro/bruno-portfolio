@@ -1,0 +1,40 @@
+meta {
+  name: Get All Users
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/users
+  body: none
+  auth: none
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("response is an array", function() {
+    expect(res.body).to.be.an('array');
+  });
+
+  test("array is not empty", function() {
+    expect(res.body.length).to.be.greaterThan(0);
+  });
+
+  test("user has required fields", function() {
+    const user = res.body[0];
+    expect(user).to.have.property('id');
+    expect(user).to.have.property('name');
+    expect(user).to.have.property('email');
+    expect(user).to.have.property('username');
+  });
+
+  test("email format is valid", function() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    res.body.forEach(function(user) {
+      expect(emailRegex.test(user.email)).to.be.true;
+    });
+  });
+}

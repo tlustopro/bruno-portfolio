@@ -1,0 +1,35 @@
+meta {
+  name: Create User
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Bruno Tester",
+    "username": "brunotester",
+    "email": "bruno@test.dev"
+  }
+}
+
+tests {
+  test("status is 201 Created", function() {
+    expect(res.status).to.equal(201);
+  });
+
+  test("response contains sent data", function() {
+    expect(res.body.name).to.equal("Bruno Tester");
+    expect(res.body.email).to.equal("bruno@test.dev");
+  });
+
+  test("server assigned an id", function() {
+    expect(res.body).to.have.property('id');
+    expect(res.body.id).to.be.a('number');
+  });
+}
