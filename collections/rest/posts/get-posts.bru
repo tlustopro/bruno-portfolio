@@ -1,0 +1,48 @@
+meta {
+  name: Get Posts
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/posts
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  // Demonstrace pre-request skriptu: ulož timestamp začátku
+  bru.setVar("requestStart", Date.now());
+}
+
+script:post-response {
+  // Ulož počet postů do proměnné pro případné další requesty
+  const count = res.body.length;
+  bru.setVar("postCount", count);
+  console.log("Fetched posts:", count);
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("returns exactly 100 posts", function() {
+    expect(res.body.length).to.equal(100);
+  });
+
+  test("each post has title and body", function() {
+    res.body.forEach(function(post) {
+      expect(post).to.have.property('title');
+      expect(post).to.have.property('body');
+      expect(post.title).to.be.a('string').and.not.empty;
+    });
+  });
+
+  test("userId is a positive integer", function() {
+    res.body.forEach(function(post) {
+      expect(post.userId).to.be.a('number');
+      expect(post.userId).to.be.greaterThan(0);
+    });
+  });
+}
