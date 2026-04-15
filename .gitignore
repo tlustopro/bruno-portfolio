@@ -12,3 +12,9 @@ Thumbs.db
 
 # Node
 node_modules/
+
+# Claude
+Claude.MD
+
+# Interní plánování (ne součást portfolia)
+docs/superpowers/
