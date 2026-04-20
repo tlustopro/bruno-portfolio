@@ -1,0 +1,39 @@
+name: API Tests (Bruno)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  bruno-tests:
+    name: Run Bruno collections
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: collections
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Bruno CLI
+        run: npm install -g @usebruno/cli
+
+      - name: Run REST tests
+        run: bru run rest --env prod --reporter-junit ../reports/rest-junit.xml --reporter-html ../reports/rest.html
+
+      - name: Run GraphQL tests
+        run: bru run graphql --env prod --reporter-junit ../reports/graphql-junit.xml --reporter-html ../reports/graphql.html
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bruno-reports
+          path: reports/
