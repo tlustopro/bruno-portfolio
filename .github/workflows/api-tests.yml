@@ -26,10 +26,10 @@ jobs:
         run: npm install -g @usebruno/cli
 
       - name: Run REST tests
-        run: bru run rest --env prod --reporter-junit ../reports/rest-junit.xml --reporter-html ../reports/rest.html
+        run: bru run rest -r --env prod --reporter-junit ../reports/rest-junit.xml --reporter-html ../reports/rest.html
 
       - name: Run GraphQL tests
-        run: bru run graphql --env prod --reporter-junit ../reports/graphql-junit.xml --reporter-html ../reports/graphql.html
+        run: bru run graphql -r --env prod --reporter-junit ../reports/graphql-junit.xml --reporter-html ../reports/graphql.html
 
       - name: Upload reports
         if: always()
