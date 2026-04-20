@@ -36,9 +36,21 @@ collections/
 
 ```bash
 npm install -g @usebruno/cli
-bru run --env prod collections/rest/users/
-bru run --env prod collections/graphql/
+cd collections
+bru run rest -r --env prod
+bru run graphql -r --env prod
 ```
+
+## CI/CD
+
+Every push and pull request against `main` triggers the [`API Tests (Bruno)`](.github/workflows/api-tests.yml) GitHub Actions workflow, which:
+
+1. Installs `@usebruno/cli` on an Ubuntu runner.
+2. Runs the REST and GraphQL collections with `--env prod`.
+3. Emits JUnit + HTML reports and uploads them as the `bruno-reports` workflow artifact.
+4. On `main`, publishes the HTML reports to **GitHub Pages** — a landing page links to the REST and GraphQL reports and shows the commit SHA.
+
+One-time setup: in the repo go to **Settings → Pages → Build and deployment → Source: GitHub Actions**. After the next successful run on `main`, the reports are live at `https://<user>.github.io/<repo>/`.
 
 ## Testing Logic Examples
 

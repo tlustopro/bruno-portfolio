@@ -7,6 +7,15 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   bruno-tests:
     name: Run Bruno collections
@@ -26,14 +35,72 @@ jobs:
         run: npm install -g @usebruno/cli
 
       - name: Run REST tests
+        id: rest
+        continue-on-error: true
         run: bru run rest -r --env prod --reporter-junit ../reports/rest-junit.xml --reporter-html ../reports/rest.html
 
       - name: Run GraphQL tests
+        id: graphql
+        continue-on-error: true
         run: bru run graphql -r --env prod --reporter-junit ../reports/graphql-junit.xml --reporter-html ../reports/graphql.html
 
-      - name: Upload reports
+      - name: Build reports index
+        if: always()
+        working-directory: ${{ github.workspace }}
+        run: |
+          cat > reports/index.html <<EOF
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>Bruno API Test Reports</title>
+            <style>
+              body { font-family: system-ui, sans-serif; max-width: 640px; margin: 3rem auto; padding: 0 1rem; }
+              h1 { margin-bottom: 0.25rem; }
+              .meta { color: #666; font-size: 0.9rem; margin-bottom: 2rem; }
+              ul { list-style: none; padding: 0; }
+              li { margin: 0.75rem 0; }
+              a { display: inline-block; padding: 0.75rem 1rem; background: #f4f4f5; border-radius: 6px; text-decoration: none; color: #111; }
+              a:hover { background: #e4e4e7; }
+            </style>
+          </head>
+          <body>
+            <h1>Bruno API Test Reports</h1>
+            <div class="meta">Commit ${GITHUB_SHA::7} &middot; $(date -u +"%Y-%m-%d %H:%M UTC")</div>
+            <ul>
+              <li><a href="rest.html">REST report</a></li>
+              <li><a href="graphql.html">GraphQL report</a></li>
+            </ul>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload reports artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: bruno-reports
           path: reports/
+
+      - name: Upload Pages artifact
+        if: always() && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: reports/
+
+      - name: Fail job if any test step failed
+        if: steps.rest.outcome == 'failure' || steps.graphql.outcome == 'failure'
+        run: exit 1
+
+  deploy-pages:
+    name: Deploy reports to GitHub Pages
+    if: github.ref == 'refs/heads/main'
+    needs: bruno-tests
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
